@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
+import com.example.jetpackcompose.composeElements.instagram.InstagramProfileCard
+import com.example.jetpackcompose.composeElements.instagram.InstagramViewModel
 import com.example.jetpackcompose.composeElements.vk.MainScreen
 import com.example.jetpackcompose.composeElements.vk.PostCard
 import com.example.jetpackcompose.ui.theme.ComposeProjectTheme
@@ -17,6 +20,7 @@ import com.example.jetpackcompose.ui.theme.ComposeProjectTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val viewModel = ViewModelProvider(this)[InstagramViewModel::class.java]
         setContent {
             ComposeProjectTheme() {
                 Box(
@@ -26,7 +30,7 @@ class MainActivity : ComponentActivity() {
                         .padding(8.dp)
 
                 ) {
-                    MainScreen()
+                    InstagramProfileCard(viewModel = viewModel)
                 }
             }
         }
