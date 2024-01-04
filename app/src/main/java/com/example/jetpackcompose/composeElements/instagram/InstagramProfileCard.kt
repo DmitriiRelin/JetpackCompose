@@ -37,12 +37,9 @@ import com.example.jetpackcompose.ui.theme.ComposeProjectTheme
 
 @Composable
 fun InstagramProfileCard(
-    viewModel: InstagramViewModel
+    model: InstagramModel,
+    onFollowedButtonClickListener: (InstagramModel) -> Unit
 ) {
-
-    val isFollowed = viewModel.isFollowing.observeAsState(false)
-    //val isFollowed by viewModel.isFollowing.observeAsState(false)
-
 
     Card(
         modifier = Modifier.padding(8.dp),
@@ -72,20 +69,20 @@ fun InstagramProfileCard(
                 UserStatistics(title = "Following", value = "76")
             }
             Text(
-                text = "Instagram",
+                text = "Instagram ${model.id}",
                 fontSize = 32.sp,
                 fontFamily = FontFamily.Cursive
             )
             Text(
-                text = "#YoursToMake",
+                text = "#${model.title}",
                 fontSize = 14.sp,
             )
             Text(
                 text = "http://www.twitch.tv",
                 fontSize = 14.sp,
             )
-            FollowButton(isFollowed = isFollowed) {
-                viewModel.changeFollowingStatus()
+            FollowButton(isFollowed = model.isFollowed) {
+                onFollowedButtonClickListener(model)
             }
         }
     }
@@ -94,7 +91,7 @@ fun InstagramProfileCard(
 
 @Composable
 private fun FollowButton(
-    isFollowed: State<Boolean>,
+    isFollowed: Boolean,
     clickListener: () -> Unit
 ) {
     Button(
@@ -102,7 +99,7 @@ private fun FollowButton(
             clickListener()
         },
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = if (isFollowed.value) {
+            backgroundColor = if (isFollowed) {
                 MaterialTheme.colors.primary.copy(
                     alpha = 0.5F
                 )
@@ -111,7 +108,7 @@ private fun FollowButton(
             }
         )
     ) {
-        val text = if (isFollowed.value) {
+        val text = if (isFollowed) {
             "Unfollow"
         } else {
             "Follow"
