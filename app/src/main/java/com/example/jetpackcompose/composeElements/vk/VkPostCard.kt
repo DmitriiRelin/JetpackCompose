@@ -37,7 +37,10 @@ import java.lang.IllegalStateException
 @Composable
 fun PostCard(
     modifier: Modifier = Modifier, feedPost: VkFeedPost,
-    onStatisticItemClickListener: (VkStatisticItem) -> Unit
+    onLickClickListener: (VkStatisticItem) -> Unit,
+    onShareClickListener: (VkStatisticItem) -> Unit,
+    onCommentClickListener: (VkStatisticItem) -> Unit,
+    onViewsClickListener: (VkStatisticItem) -> Unit,
 ) {
     Card(modifier = modifier) {
         Column(modifier = Modifier.padding(8.dp)) {
@@ -53,7 +56,13 @@ fun PostCard(
                 ), contentDescription = null, contentScale = ContentScale.FillWidth
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Statistics(statistics = feedPost.statistics, onItemClickListener = onStatisticItemClickListener)
+            Statistics(
+                statistics = feedPost.statistics,
+                onLickClickListener = onLickClickListener,
+                onShareClickListener = onShareClickListener,
+                onCommentClickListener = onCommentClickListener,
+                onViewsClickListener = onViewsClickListener
+            )
         }
     }
 }
@@ -86,28 +95,32 @@ private fun PostHeader(feedPost: VkFeedPost) {
 
 @Composable
 private fun Statistics(
-    statistics: List<VkStatisticItem>, onItemClickListener: (VkStatisticItem) -> Unit
+    statistics: List<VkStatisticItem>,
+    onLickClickListener: (VkStatisticItem) -> Unit,
+    onShareClickListener: (VkStatisticItem) -> Unit,
+    onCommentClickListener: (VkStatisticItem) -> Unit,
+    onViewsClickListener: (VkStatisticItem) -> Unit,
 ) {
 
     Row() {
         Row(modifier = Modifier.weight(1f)) {
             val viewsItem = statistics.getItemByType(StatisticType.VIEWS)
             IconWithText(iconResId = R.drawable.ic_views_count, text = viewsItem.count.toString(), onItemClickListener = {
-                onItemClickListener(viewsItem)
+                onViewsClickListener(viewsItem)
             })
         }
         Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.SpaceBetween) {
             val sharesItem = statistics.getItemByType(StatisticType.SHARES)
             IconWithText(iconResId = R.drawable.ic_share, text = sharesItem.count.toString(), onItemClickListener = {
-                onItemClickListener(sharesItem)
+                onShareClickListener(sharesItem)
             })
             val commentsItem = statistics.getItemByType(StatisticType.COMMENTS)
             IconWithText(iconResId = R.drawable.ic_comment, text = commentsItem.count.toString(), onItemClickListener = {
-                onItemClickListener(commentsItem)
+                onCommentClickListener(commentsItem)
             })
             val likesItem = statistics.getItemByType(StatisticType.LIKES)
             IconWithText(iconResId = R.drawable.ic_like, text = likesItem.count.toString(), onItemClickListener = {
-                onItemClickListener(likesItem)
+                onLickClickListener(likesItem)
             })
         }
     }

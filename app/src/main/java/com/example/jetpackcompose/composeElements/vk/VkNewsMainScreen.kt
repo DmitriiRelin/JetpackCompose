@@ -15,6 +15,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -26,12 +27,8 @@ import androidx.compose.ui.unit.dp
 import com.example.jetpackcompose.domain.VkFeedPost
 import kotlinx.coroutines.launch
 
-@Preview
 @Composable
-fun VkMainScreen() {
-    val feedPost = remember {
-        mutableStateOf(VkFeedPost())
-    }
+fun VkMainScreen(viewModel: VkViewModel) {
 
     Scaffold(
         bottomBar = {
@@ -60,22 +57,19 @@ fun VkMainScreen() {
             }
         }
     ) {
+        val feedPost = viewModel.feedPost.observeAsState(VkFeedPost())
+
         PostCard(
             modifier = Modifier.padding(8.dp),
             feedPost = feedPost.value,
-            onStatisticItemClickListener = { newItem ->
-                val oldStatistics = feedPost.value.statistics
-                val newStatistics = oldStatistics.toMutableList().apply {
-                    replaceAll { oldItem ->
-                        if (oldItem.type == newItem.type) {
-                            oldItem.copy(count = oldItem.count + 1)
-                        } else {
-                            oldItem
-                        }
-                    }
-                }
-                feedPost.value = feedPost.value.copy(statistics = newStatistics)
-            }
+
+            onCommentClickListener = viewModel::updateCount,
+            onLickClickListener = viewModel::updateCount,
+            onShareClickListener = viewModel::updateCount,
+
+            onViewsClickListener = {
+                viewModel.updateCount(it)
+            },
         )
     }
 }
