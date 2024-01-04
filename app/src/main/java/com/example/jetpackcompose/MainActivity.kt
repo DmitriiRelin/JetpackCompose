@@ -10,7 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.jetpackcompose.composeElements.PostCard
+import com.example.jetpackcompose.composeElements.vk.MainScreen
+import com.example.jetpackcompose.composeElements.vk.PostCard
 import com.example.jetpackcompose.ui.theme.ComposeProjectTheme
 
 class MainActivity : ComponentActivity() {
@@ -25,7 +26,7 @@ class MainActivity : ComponentActivity() {
                         .padding(8.dp)
 
                 ) {
-                    PostCard()
+                    MainScreen()
                 }
             }
         }

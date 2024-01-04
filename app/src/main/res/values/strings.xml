@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">JetpackCompose</string>
+
+    <string name="navigation_item_main">Main</string>
+    <string name="navigation_item_favorite">Favorite</string>
+    <string name="navigation_item_profile">Profile</string>
+
     <string name="template_text">Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...</string>
+
 </resources>

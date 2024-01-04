@@ -1,4 +1,4 @@
-package com.example.jetpackcompose.composeElements
+package com.example.jetpackcompose.composeElements.vk
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
