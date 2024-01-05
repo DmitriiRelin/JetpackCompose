@@ -7,13 +7,19 @@ import com.example.jetpackcompose.domain.VkFeedPost
 import com.example.jetpackcompose.domain.VkStatisticItem
 import java.lang.IllegalStateException
 
-class VkViewModel: ViewModel() {
+class VkViewModel : ViewModel() {
 
-    private val _feedPost = MutableLiveData(VkFeedPost())
-    val feedPost: LiveData<VkFeedPost> = _feedPost
+    private val sourceList = mutableListOf<VkFeedPost>().apply {
+        repeat(10) {
+            add(VkFeedPost(id = it))
+        }
+    }
+    private val _feedPosts = MutableLiveData<List<VkFeedPost>>(sourceList)
+    val feedPosts: LiveData<List<VkFeedPost>> = _feedPosts
 
-    fun updateCount(item: VkStatisticItem) {
-        val oldStatistics = feedPost.value?.statistics ?: throw IllegalStateException()
+    fun updateCount(feedPost: VkFeedPost, item: VkStatisticItem) {
+        val oldPosts = feedPosts.value?.toMutableList() ?: mutableListOf()
+        val oldStatistics = feedPost.statistics
         val newStatistics = oldStatistics.toMutableList().apply {
             replaceAll { oldItem ->
                 if (oldItem.type == item.type) {
@@ -23,7 +29,22 @@ class VkViewModel: ViewModel() {
                 }
             }
         }
-        _feedPost.value = feedPost.value?.copy(statistics = newStatistics)
+        val newFeedPost = feedPost.copy(statistics = newStatistics)
+        _feedPosts.value = oldPosts.apply {
+            replaceAll {
+                if (it.id == newFeedPost.id) {
+                    newFeedPost
+                } else {
+                    it
+                }
+            }
+        }
+    }
+
+    fun remove(feedPost: VkFeedPost) {
+        val oldPosts = feedPosts.value?.toMutableList() ?: mutableListOf()
+        oldPosts.remove(feedPost)
+        _feedPosts.value = oldPosts
     }
 
 }
