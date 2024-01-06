@@ -17,13 +17,6 @@ class VkViewModel : ViewModel() {
     private val _feedPosts = MutableLiveData<List<VkFeedPost>>(sourceList)
     val feedPosts: LiveData<List<VkFeedPost>> = _feedPosts
 
-    private val _selectedNavItem = MutableLiveData<NavigationItem>(NavigationItem.Home)
-    val selectedNavItem: LiveData<NavigationItem> = _selectedNavItem
-
-    fun selectNavItem(item: NavigationItem) {
-        _selectedNavItem.value = item
-    }
-
     fun updateCount(feedPost: VkFeedPost, item: VkStatisticItem) {
         val oldPosts = feedPosts.value?.toMutableList() ?: mutableListOf()
         val oldStatistics = feedPost.statistics

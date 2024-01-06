@@ -34,6 +34,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,23 +42,32 @@ import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.jetpackcompose.domain.VkFeedPost
+import com.example.jetpackcompose.navigation.AppNavGraph
+import com.example.jetpackcompose.navigation.NavigationState
+import com.example.jetpackcompose.navigation.Screen
+import com.example.jetpackcompose.navigation.rememberNavigationState
 import kotlinx.coroutines.launch
 
 @Composable
 fun VkMainScreen(viewModel: VkViewModel) {
-
-    val selectedNavItem by viewModel.selectedNavItem.observeAsState(NavigationItem.Home)
+    val navigationState = rememberNavigationState()
 
     Scaffold(
         bottomBar = {
-            BottomNavigation() {
+            BottomNavigation {
+                val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
+                val currentRout = navBackStackEntry?.destination?.route
+
                 val items = listOf(NavigationItem.Home, NavigationItem.Favorite, NavigationItem.Profile)
+
                 items.forEach { item ->
                     BottomNavigationItem(
-                        selected = selectedNavItem == item,
+                        selected = currentRout == item.screen.route,
                         onClick = {
-                            viewModel.selectNavItem(item)
+                            navigationState.navigateTo(item.screen.route)
                         },
                         icon = {
                             Icon(item.icon, contentDescription = null)
@@ -72,27 +82,28 @@ fun VkMainScreen(viewModel: VkViewModel) {
             }
         }
     ) { paddingValues ->
-        when (selectedNavItem) {
-            NavigationItem.Home -> {
+        AppNavGraph(
+            navHostController = navigationState.navHostController,
+            homeScreenContent = {
                 HomeVkScreen(viewModel = viewModel, paddingValues = paddingValues)
-            }
-
-            NavigationItem.Profile -> {
+            },
+            favouriteScreenContent = {
+                TextCounter(name = "Favorite")
+            },
+            profileScreenContent = {
                 TextCounter(name = "Profile")
             }
-
-            NavigationItem.Favorite -> {
-                TextCounter(name = "Favorite")
-            }
-        }
+        )
     }
 }
 
 @Composable
 private fun TextCounter(name: String) {
-    var count by remember {
+
+    var count by rememberSaveable {
         mutableStateOf(0)
     }
+
     Text(
         modifier = Modifier.clickable {
             count++
