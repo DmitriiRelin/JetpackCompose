@@ -2,6 +2,7 @@ package com.example.jetpackcompose.composeElements.vk
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -20,6 +21,7 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Text
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Colors
 import androidx.compose.material.DismissDirection
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SwipeToDismiss
@@ -27,11 +29,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.rememberDismissState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,23 +44,20 @@ import androidx.compose.ui.unit.dp
 import com.example.jetpackcompose.domain.VkFeedPost
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun VkMainScreen(viewModel: VkViewModel) {
+
+    val selectedNavItem by viewModel.selectedNavItem.observeAsState(NavigationItem.Home)
 
     Scaffold(
         bottomBar = {
             BottomNavigation() {
-                val selectedItemPosition = remember {
-                    mutableStateOf(0)
-                }
-
                 val items = listOf(NavigationItem.Home, NavigationItem.Favorite, NavigationItem.Profile)
-                items.forEachIndexed() { index, item ->
+                items.forEach { item ->
                     BottomNavigationItem(
-                        selected = selectedItemPosition.value == index,
+                        selected = selectedNavItem == item,
                         onClick = {
-                            selectedItemPosition.value = index
+                            viewModel.selectNavItem(item)
                         },
                         icon = {
                             Icon(item.icon, contentDescription = null)
@@ -69,61 +71,35 @@ fun VkMainScreen(viewModel: VkViewModel) {
                 }
             }
         }
-    ) {
-        val feedPosts = viewModel.feedPosts.observeAsState(listOf())
+    ) { paddingValues ->
+        when (selectedNavItem) {
+            NavigationItem.Home -> {
+                HomeVkScreen(viewModel = viewModel, paddingValues = paddingValues)
+            }
 
-        LazyColumn(
-            modifier = Modifier.padding(it),
-            contentPadding = PaddingValues(
-                top = 16.dp,
-                start = 8.dp,
-                end = 8.dp,
-                bottom = 72.dp
-            ),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(
-                items = feedPosts.value,
-                key = { it.id }
-            ) { feedPost ->
+            NavigationItem.Profile -> {
+                TextCounter(name = "Profile")
+            }
 
-                val dismissState = rememberDismissState()
-
-                if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                    viewModel.remove(feedPost)
-                }
-
-                SwipeToDismiss(
-                    modifier = Modifier.animateItemPlacement(),
-                    state = dismissState,
-                    background = {
-
-                    },
-                    directions = setOf(DismissDirection.EndToStart)
-                ) {
-                    PostCard(
-                        feedPost = feedPost,
-
-                        onCommentClickListener = { statisticItem ->
-                            viewModel.updateCount(feedPost, statisticItem)
-                        },
-                        onLickClickListener = { statisticItem ->
-                            viewModel.updateCount(feedPost, statisticItem)
-                        },
-                        onShareClickListener = { statisticItem ->
-                            viewModel.updateCount(feedPost, statisticItem)
-                        },
-
-                        onViewsClickListener = { statisticItem ->
-                            viewModel.updateCount(feedPost, statisticItem)
-                        },
-                    )
-                }
+            NavigationItem.Favorite -> {
+                TextCounter(name = "Favorite")
             }
         }
-
-
     }
+}
+
+@Composable
+private fun TextCounter(name: String) {
+    var count by remember {
+        mutableStateOf(0)
+    }
+    Text(
+        modifier = Modifier.clickable {
+            count++
+        },
+        text = "$name Count $count", color = Color.Black
+    )
+
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
