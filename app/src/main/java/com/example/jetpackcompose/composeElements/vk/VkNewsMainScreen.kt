@@ -28,9 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.jetpackcompose.domain.VkFeedPost
 import com.example.jetpackcompose.navigation.AppNavGraph
+import com.example.jetpackcompose.navigation.NavigationItem
+import com.example.jetpackcompose.navigation.Screen
 import com.example.jetpackcompose.navigation.rememberNavigationState
 import kotlinx.coroutines.launch
 
@@ -45,15 +48,22 @@ fun VkMainScreen() {
         bottomBar = {
             BottomNavigation {
                 val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
-                val currentRout = navBackStackEntry?.destination?.route
 
                 val items = listOf(NavigationItem.Home, NavigationItem.Favorite, NavigationItem.Profile)
 
                 items.forEach { item ->
+
+                    val selected = navBackStackEntry?.destination?.hierarchy?.any {
+                        it.route == item.screen.route
+                    } ?: false
+
+
                     BottomNavigationItem(
-                        selected = currentRout == item.screen.route,
+                        selected = selected,
                         onClick = {
-                            navigationState.navigateTo(item.screen.route)
+                            if (!selected) {
+                                navigationState.navigateTo(item.screen.route)
+                            }
                         },
                         icon = {
                             Icon(item.icon, contentDescription = null)
@@ -70,27 +80,27 @@ fun VkMainScreen() {
     ) { paddingValues ->
         AppNavGraph(
             navHostController = navigationState.navHostController,
-            homeScreenContent = {
-                if (commentsToPost.value == null) {
-                    HomeVkScreen(
-                        paddingValues = paddingValues,
-                        onCommentClickListener = {
-                            commentsToPost.value = it
-                        })
-                } else {
-                    CommentsVkScreen(
-                        onBackPressed = {
-                            commentsToPost.value = null
-                        },
-                        feedPost = commentsToPost.value!!
-                    )
-                }
+            newsFeedScreenContent = {
+                HomeVkScreen(
+                    paddingValues = paddingValues,
+                    onCommentClickListener = {
+                        commentsToPost.value = it
+                        navigationState.navigateToComments()
+                    })
             },
             favouriteScreenContent = {
                 TextCounter(name = "Favorite")
             },
             profileScreenContent = {
                 TextCounter(name = "Profile")
+            },
+            commentsScreenContent = {
+                CommentsVkScreen(
+                    onBackPressed = {
+                        navigationState.navHostController.popBackStack()
+                    },
+                    feedPost = commentsToPost.value!!
+                )
             }
         )
     }
