@@ -1,13 +1,7 @@
 package com.example.jetpackcompose.composeElements.vk
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -20,17 +14,11 @@ import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Text
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Colors
-import androidx.compose.material.DismissDirection
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.rememberDismissState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,22 +26,20 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.example.jetpackcompose.domain.VkFeedPost
 import com.example.jetpackcompose.navigation.AppNavGraph
-import com.example.jetpackcompose.navigation.NavigationState
-import com.example.jetpackcompose.navigation.Screen
 import com.example.jetpackcompose.navigation.rememberNavigationState
 import kotlinx.coroutines.launch
 
 @Composable
-fun VkMainScreen(viewModel: VkViewModel) {
+fun VkMainScreen() {
     val navigationState = rememberNavigationState()
+    val commentsToPost: MutableState<VkFeedPost?> = remember {
+        mutableStateOf(null)
+    }
 
     Scaffold(
         bottomBar = {
@@ -85,7 +71,17 @@ fun VkMainScreen(viewModel: VkViewModel) {
         AppNavGraph(
             navHostController = navigationState.navHostController,
             homeScreenContent = {
-                HomeVkScreen(viewModel = viewModel, paddingValues = paddingValues)
+                if (commentsToPost.value == null) {
+                    HomeVkScreen(
+                        paddingValues = paddingValues,
+                        onCommentClickListener = {
+                            commentsToPost.value = it
+                        })
+                } else {
+                    CommentsVkScreen {
+                        commentsToPost.value = null
+                    }
+                }
             },
             favouriteScreenContent = {
                 TextCounter(name = "Favorite")
