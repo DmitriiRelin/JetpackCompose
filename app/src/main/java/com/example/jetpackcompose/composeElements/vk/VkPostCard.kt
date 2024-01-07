@@ -37,7 +37,7 @@ import java.lang.IllegalStateException
 @Composable
 fun PostCard(
     modifier: Modifier = Modifier, feedPost: VkFeedPost,
-    onLickClickListener: (VkStatisticItem) -> Unit,
+    onLikeClickListener: (VkStatisticItem) -> Unit,
     onShareClickListener: (VkStatisticItem) -> Unit,
     onCommentClickListener: (VkStatisticItem) -> Unit,
     onViewsClickListener: (VkStatisticItem) -> Unit,
@@ -58,7 +58,7 @@ fun PostCard(
             Spacer(modifier = Modifier.height(8.dp))
             Statistics(
                 statistics = feedPost.statistics,
-                onLickClickListener = onLickClickListener,
+                onLickClickListener = onLikeClickListener,
                 onShareClickListener = onShareClickListener,
                 onCommentClickListener = onCommentClickListener,
                 onViewsClickListener = onViewsClickListener

@@ -1,5 +1,6 @@
 package com.example.jetpackcompose.composeElements.vk
 
+import androidx.activity.OnBackPressedCallback
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -34,7 +35,8 @@ import com.example.jetpackcompose.ui.theme.ComposeProjectTheme
 @Composable
 fun CommentsVkScreen(
     feedPost: VkFeedPost,
-    comments: List<VkPostComment>
+    comments: List<VkPostComment>,
+    onBackPressed: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -43,7 +45,9 @@ fun CommentsVkScreen(
                     Text(text = "Comments for FeedPost id ${feedPost.id}")
                 },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {
+                        onBackPressed()
+                    }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = null

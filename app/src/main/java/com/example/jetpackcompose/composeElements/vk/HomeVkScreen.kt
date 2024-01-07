@@ -1,5 +1,6 @@
 package com.example.jetpackcompose.composeElements.vk
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,14 +15,44 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.jetpackcompose.domain.VkPostComment
+import com.example.jetpackcompose.domain.VkFeedPost
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeVkScreen(viewModel: VkViewModel, paddingValues: PaddingValues) {
 
-    val feedPosts = viewModel.feedPosts.observeAsState(listOf())
+    val screenState = viewModel.screenState.observeAsState(HomeVkScreenState.Initial)
 
+    when (val currentState = screenState.value) {
+        is HomeVkScreenState.Posts -> {
+            FeedPosts(viewModel = viewModel, paddingValues = paddingValues, posts = currentState.posts)
+        }
+
+        is HomeVkScreenState.Comments -> {
+            CommentsVkScreen(
+                feedPost = currentState.feedPost,
+                comments = currentState.comments,
+                onBackPressed = {
+                    viewModel.closeComments()
+                }
+            )
+            BackHandler {
+                viewModel.closeComments()
+            }
+        }
+
+        is HomeVkScreenState.Initial -> {
+
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+@Composable
+private fun FeedPosts(
+    viewModel: VkViewModel,
+    paddingValues: PaddingValues,
+    posts: List<VkFeedPost>,
+) {
     LazyColumn(
         modifier = Modifier.padding(paddingValues),
         contentPadding = PaddingValues(
@@ -33,7 +64,7 @@ fun HomeVkScreen(viewModel: VkViewModel, paddingValues: PaddingValues) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(
-            items = feedPosts.value,
+            items = posts,
             key = { it.id }
         ) { feedPost ->
 
@@ -54,10 +85,10 @@ fun HomeVkScreen(viewModel: VkViewModel, paddingValues: PaddingValues) {
                 PostCard(
                     feedPost = feedPost,
 
-                    onCommentClickListener = { statisticItem ->
-                        viewModel.updateCount(feedPost, statisticItem)
+                    onCommentClickListener = {
+                        viewModel.showComments(feedPost)
                     },
-                    onLickClickListener = { statisticItem ->
+                    onLikeClickListener = { statisticItem ->
                         viewModel.updateCount(feedPost, statisticItem)
                     },
                     onShareClickListener = { statisticItem ->
