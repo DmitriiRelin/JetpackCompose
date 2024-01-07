@@ -37,8 +37,12 @@ import com.example.jetpackcompose.ui.theme.ComposeProjectTheme
 @Composable
 fun CommentsVkScreen(
     onBackPressed: () -> Unit,
+    feedPost: VkFeedPost
 ) {
-    val viewModel: VkCommentsViewModel = viewModel()
+    val viewModel: VkCommentsViewModel = viewModel(
+        factory = VkCommentsViewModelFactory(feedPost)
+    )
+    
     val screenState = viewModel.screenState.observeAsState(CommentsVkScreenState.Initial)
     val currentState = screenState.value
 

@@ -78,9 +78,12 @@ fun VkMainScreen() {
                             commentsToPost.value = it
                         })
                 } else {
-                    CommentsVkScreen {
-                        commentsToPost.value = null
-                    }
+                    CommentsVkScreen(
+                        onBackPressed = {
+                            commentsToPost.value = null
+                        },
+                        feedPost = commentsToPost.value!!
+                    )
                 }
             },
             favouriteScreenContent = {
