@@ -40,9 +40,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun VkMainScreen() {
     val navigationState = rememberNavigationState()
-    val commentsToPost: MutableState<VkFeedPost?> = remember {
-        mutableStateOf(null)
-    }
+
 
     Scaffold(
         bottomBar = {
@@ -84,8 +82,7 @@ fun VkMainScreen() {
                 HomeVkScreen(
                     paddingValues = paddingValues,
                     onCommentClickListener = {
-                        commentsToPost.value = it
-                        navigationState.navigateToComments()
+                        navigationState.navigateToComments(it)
                     })
             },
             favouriteScreenContent = {
@@ -94,12 +91,12 @@ fun VkMainScreen() {
             profileScreenContent = {
                 TextCounter(name = "Profile")
             },
-            commentsScreenContent = {
+            commentsScreenContent = { feedPost ->
                 CommentsVkScreen(
                     onBackPressed = {
                         navigationState.navHostController.popBackStack()
                     },
-                    feedPost = commentsToPost.value!!
+                    feedPost = feedPost
                 )
             }
         )

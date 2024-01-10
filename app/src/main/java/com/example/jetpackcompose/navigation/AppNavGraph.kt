@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.example.jetpackcompose.domain.VkFeedPost
 
 @Composable
 fun AppNavGraph(
@@ -12,7 +13,7 @@ fun AppNavGraph(
     newsFeedScreenContent: @Composable () -> Unit,
     favouriteScreenContent: @Composable () -> Unit,
     profileScreenContent: @Composable () -> Unit,
-    commentsScreenContent: @Composable () -> Unit
+    commentsScreenContent: @Composable (VkFeedPost) -> Unit
 ) {
     NavHost(
         navController = navHostController,

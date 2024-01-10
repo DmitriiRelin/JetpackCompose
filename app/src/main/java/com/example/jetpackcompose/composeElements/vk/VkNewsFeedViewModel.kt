@@ -10,7 +10,10 @@ class VkNewsFeedViewModel : ViewModel() {
 
     private val sourceList = mutableListOf<VkFeedPost>().apply {
         repeat(10) {
-            add(VkFeedPost(id = it))
+            add(VkFeedPost(
+                id = it,
+                contentText = "Content ${it}"
+            ))
         }
     }
 
